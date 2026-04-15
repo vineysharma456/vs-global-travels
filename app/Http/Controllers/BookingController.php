@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TicketQueries;
+use App\Services\WhatsAppService;
 // use Illuminate\Http\Request;
 // use Illuminate\Support\Facades\Mail;
 
@@ -55,7 +56,14 @@ class BookingController extends Controller
 
         // Send confirmation email to the user
         // Mail::to($booking->email)->send(new BookingConfirmation($booking));
+          // ✅ Format number
+    $phone = '+' . $data['country_code'] . $data['contact_number'];
 
+        // ✅ Send TEMPLATE (first message)
+        $whatsapp->sendTemplate($phone, [
+            "1" => now()->format('d/m'),
+            "2" => now()->format('h:i A')
+        ]);
         return redirect()->route('booking.success', $booking)
                          ->with('success', 'Booking received! A confirmation has been sent to ' . $booking->email);
     }

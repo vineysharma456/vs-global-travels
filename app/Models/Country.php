@@ -14,6 +14,7 @@ class Country extends Model
         'flag_emoji',
         'card_image',
         'visa_status',
+        'visa_type',
         'visa_fee',
         'processing_days',
         'stay_duration',

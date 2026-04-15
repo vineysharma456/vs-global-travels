@@ -424,9 +424,9 @@
     <div class="page-header">
         <div>
             <h1 class="page-title">Explore <span>Destinations</span></h1>
-            <p class="page-subtitle">
+            {{-- <p class="page-subtitle">
                 {{ $countries->total() }} {{ Str::plural('destination', $countries->total()) }} available — find your next visa in seconds
-            </p>
+            </p> --}}
         </div>
     </div>
 
@@ -447,9 +447,9 @@
                 <span class="filter-label">Type</span>
                 <select name="type" onchange="document.getElementById('filterForm').submit()">
                     <option value="">All Visa Types</option>
-                    @foreach($visaStatuses as $status)
-                        <option value="{{ $status }}" {{ request('type') == $status ? 'selected' : '' }}>
-                            {{ $status }}
+                    @foreach($visa_types as $visatype)
+                        <option value="{{ $visatype->id }}" {{ request('type') == $visatype ? 'selected' : '' }}>
+                            {{ $visatype->name }}
                         </option>
                     @endforeach
                 </select>
@@ -530,7 +530,7 @@
             };
         @endphp
 
-        <a class="country-card" href="#">
+        <a class="country-card" href="{{ route('country-type',$country->id)}}">
 
             {{-- Background image — fixed path --}}
             @if($country->card_image)
@@ -551,7 +551,7 @@
 
             {{-- Flag top-right --}}
             @if($country->flag_emoji)
-                <span class="card-flag">{{ $country->flag_emoji }}</span>
+                <img class="card-flag"  src="{{ asset('storage/' . $country->flag_emoji) }}">{{ $country->flag_emoji }}</img>
             @endif
 
             {{-- Hover: documents needed --}}
@@ -574,7 +574,7 @@
                 <div class="card-meta">
                     <div class="meta-item">
                         <span class="meta-key">Type</span>
-                        <span class="meta-val">{{ $country->visa_status ?? '—' }}</span>
+                        <span class="meta-val">{{ $country->visa_type_name }}</span>
                     </div>
                     @if($country->validity_days)
                     <div class="meta-item">

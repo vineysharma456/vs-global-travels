@@ -14,81 +14,168 @@ class CountryController extends Controller
     public function addCountries()
     {
         $visa_type_document = VisaTypeDocument::get();
-        $visa_type          = VisaType::get();
+        $visa_types          = VisaType::get();
 
-        return view('admin.country.add-country', compact('visa_type', 'visa_type_document'));
+        return view('admin.country.add-country', compact('visa_types', 'visa_type_document'));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'country_name'    => 'required|string|max:255',
+    //         'flag_emoji'      => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+    //         'card_image'      => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+
+           
+    //         'visa_type_id'    => 'required|exists:visa_types,id',
+
+    //         'visa_fee'        => 'nullable|numeric|min:0',
+    //         'processing_days' => 'nullable|integer|min:0',
+    //         'stay_duration'   => 'nullable|integer|min:1',
+    //         'validity_days'   => 'nullable|integer|min:1',
+
+    //         'documents'       => 'nullable|array',
+    //         'documents.*'     => 'exists:visa_type_documents,id',
+
+    //         'is_published'    => 'nullable',
+    //         'is_featured'     => 'nullable',
+    //         'is_visa_free'    => 'nullable',
+    //     ]);
+
+    //     try {
+    //         // ✅ 1. Store image FIRST
+    //        $cardImagePath = $request->file('card_image')->store('countries', 'public');
+    //        $flagImagePath = $request->file('flag_emoji')->store('countries-flags', 'public');
+
+
+    //         DB::beginTransaction();
+
+    //         // ✅ 2. Create country
+    //         $country = Country::create([
+    //             'country_name'    => $validated['country_name'],
+    //             'flag_emoji' => $flagImagePath,
+    //             'card_image'      => $imagePath,
+
+    //             // ✅ store ID instead of text
+    //             'visa_type_id'    => $validated['visa_type_id'],
+
+    //             'visa_fee'        => $validated['visa_fee'] ?? 0,
+    //             'processing_days' => $validated['processing_days'] ?? null,
+    //             'stay_duration'   => $validated['stay_duration'] ?? null,
+    //             'validity_days'   => $validated['validity_days'] ?? null,
+
+    //             'is_published'    => $request->boolean('is_published'),
+    //             'is_featured'     => $request->boolean('is_featured'),
+    //             'is_visa_free'    => $request->boolean('is_visa_free'),
+    //         ]);
+
+    //         // ✅ 3. Attach documents
+    //         if (!empty($validated['documents'])) {
+    //             $country->documents()->sync($validated['documents']);
+    //         }
+
+    //         DB::commit();
+
+    //         return redirect()
+    //             ->back()
+    //             ->with('success', 'Country "' . $country->country_name . '" added successfully.');
+
+    //     } catch (\Throwable $e) {
+
+    //         DB::rollBack();
+
+    //         // ❌ Delete uploaded image if error
+    //         if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
+    //             Storage::disk('public')->delete($cardImagePath);
+    //             Storage::disk('public')->delete($flagImagePath);
+    //         }
+
+    //         return back()
+    //             ->withInput()
+    //             ->with('error', $e->getMessage());
+    //     }
+    // }
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'country_name'    => 'required|string|max:255',
-            'flag_emoji'      => 'required|string|max:10',
-            'card_image'      => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
-            'visa_status'     => 'required|in:No Visa Required,Visa on Arrival,e-Visa,Visa Required',
-            'visa_fee'        => 'nullable|numeric|min:0',
-            'processing_days' => 'nullable|integer|min:0',
-            'stay_duration'   => 'nullable|integer|min:1',
-            'validity_days'   => 'nullable|integer|min:1',
-            'documents'       => 'nullable|array',
-            'documents.*'     => 'exists:visa_type_documents,id',
-            'is_published'    => 'nullable',
-            'is_featured'     => 'nullable',
-            'is_visa_free'    => 'nullable',
+{
+  
+    $validated = $request->validate([
+        'country_name'    => 'required|string|max:255',
+        'flag_emoji'      => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+        'card_image'      => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+
+        'visa_type'    => 'required',
+
+        'visa_fee'        => 'nullable|numeric|min:0',
+        'processing_days' => 'nullable|integer|min:0',
+        'stay_duration'   => 'nullable|integer|min:1',
+        'validity_days'   => 'nullable|integer|min:1',
+
+        'documents'       => 'nullable|array',
+        'documents.*'     => 'exists:visa_type_documents,id',
+
+        'is_published'    => 'nullable',
+        'is_featured'     => 'nullable',
+        'is_visa_free'    => 'nullable',
+    ]);
+
+    try {
+        // ✅ 1. Store image FIRST
+        $imagePath = $request->file('card_image')->store('countries', 'public');
+        $imagePathFlag = $request->file('flag_emoji')->store('flags', 'public');
+        DB::beginTransaction();
+
+        // ✅ 2. Create country
+        $country = Country::create([
+            'country_name'    => $validated['country_name'],
+            'flag_emoji'      =>  $imagePathFlag,
+            'card_image'      => $imagePath,
+
+            // ✅ store ID instead of text
+            'visa_type'    => $validated['visa_type'],
+
+            'visa_fee'        => $validated['visa_fee'] ?? 0,
+            'processing_days' => $validated['processing_days'] ?? null,
+            'stay_duration'   => $validated['stay_duration'] ?? null,
+            'validity_days'   => $validated['validity_days'] ?? null,
+
+            'is_published'    => $request->boolean('is_published'),
+            'is_featured'     => $request->boolean('is_featured'),
+            'is_visa_free'    => $request->boolean('is_visa_free'),
         ]);
 
-        try {
-            // ✅ 1. Store image FIRST (outside transaction)
-            $imagePath = $request->file('card_image')->store('countries', 'public');
-
-            DB::beginTransaction();
-
-            // ✅ 2. Create country
-            $country = Country::create([
-                'country_name'    => $validated['country_name'],
-                'flag_emoji'      => $validated['flag_emoji'],
-                'card_image'      => $imagePath,
-                'visa_status'     => $validated['visa_status'],
-                'visa_fee'        => $validated['visa_fee'] ?? 0,
-                'processing_days' => $validated['processing_days'] ?? null,
-                'stay_duration'   => $validated['stay_duration'] ?? null,
-                'validity_days'   => $validated['validity_days'] ?? null,
-                'is_published'    => $request->boolean('is_published'),
-                'is_featured'     => $request->boolean('is_featured'),
-                'is_visa_free'    => $request->boolean('is_visa_free'),
-            ]);
-
-            // ✅ 3. Attach documents (safe)
-            if (!empty($validated['documents'])) {
-                $country->documents()->sync($validated['documents']);
-            }
-
-            DB::commit();
-
-            return redirect()
-               ->back()
-                ->with('success', 'Country "' . $country->country_name . '" added successfully.');
-
-        } catch (\Throwable $e) {
-
-            DB::rollBack();
-
-            // ❌ Delete file ONLY if exists
-            if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
-            }
-
-            // 🔥 IMPORTANT: show real error
-            return back()
-                ->withInput()
-                ->with('error', $e->getMessage());
+        // ✅ 3. Attach documents
+        if (!empty($validated['documents'])) {
+            $country->documents()->sync($validated['documents']);
         }
+
+        DB::commit();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Country "' . $country->country_name . '" added successfully.');
+
+    } catch (\Throwable $e) {
+
+        DB::rollBack();
+
+        // ❌ Delete uploaded image if error
+        if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+        }
+
+        return back()
+            ->withInput()
+            ->with('error', $e->getMessage());
     }
+}
 
 
      public function index(Request $request)
     {
-        $query = Country::with('documents')->where('is_published', true);
+      $query = Country::query()
+                ->join('visa_types', 'countries.visa_type', '=', 'visa_types.id')
+                ->select('countries.*', 'visa_types.name as visa_type_name')
+                ->where('countries.is_published', true);
  
         // Filter: visa status
         if ($request->filled('type')) {
@@ -113,12 +200,29 @@ class CountryController extends Controller
  
         $countries    = $query->latest()->paginate(12)->withQueryString();
         $documents    = VisaTypeDocument::all();
-        $visaStatuses = ['No Visa Required', 'Visa on Arrival', 'e-Visa', 'Visa Required'];
+        $visa_types =VisaType::get();
  
         return view('admin.country.country-list', compact(
             'countries',
             'documents',
-            'visaStatuses'
+            'visa_types'
         ));
+    }
+
+    public function countryType(Country $country){
+        $type = $country->visa_type;
+        
+     
+
+
+     return match($type){
+        1=>view('country-types.e-visa',compact('country')),
+        2=>view('country-types.sticker-visa'),
+        3=>view('country-types.visa-free'),
+        4=>view('country-types.e-visa'),
+
+     };
+      
+       
     }
 }

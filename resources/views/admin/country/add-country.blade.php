@@ -744,67 +744,35 @@
                                            required>
                                 </div>
                             </div>
-                            {{-- <div class="field">
-                                <label class="field-label" for="country_code">Country Code <span class="req">*</span></label>
-                                <div class="input-wrap">
-                                    <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                        <rect x="3" y="11" width="18" height="11" rx="2"/>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                    </svg>
-                                    <input type="text" id="country_code" name="country_code"
-                                           placeholder="e.g. MV" maxlength="3"
-                                           value="{{ old('country_code') }}"
-                                           style="text-transform:uppercase"
-                                           required>
-                                </div>
-                            </div> --}}
+                         
                         </div>
 
                         <div class="field-row cols-2">
+                            {{-- Replace the flag_emoji field with this: --}}
                             <div class="field">
-                                <label class="field-label" for="flag_emoji">Flag Emoji <span class="req">*</span></label>
-                                <div class="input-wrap">
-                                    <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
-                                        <line x1="4" y1="22" x2="4" y2="15"/>
-                                    </svg>
-                                    <input type="text" id="flag_emoji" name="flag_emoji"
-                                           placeholder="e.g. 🇲🇻"
-                                           value="{{ old('flag_emoji') }}"
-                                           oninput="updatePreview()"
-                                           required>
+                                <label class="field-label" for="flagEmoji">Flag Image <span class="req">*</span></label>
+                                <div class="upload-zone" id="flagUploadZone" style="padding:1rem 1.5rem;">
+                                    <input type="file" name="flag_emoji" id="flagEmoji"
+                                        accept="image/*" onchange="handleFlagPreview(this)">
+                                    <div id="flagUploadContent">
+                                        <div class="upload-icon" style="width:36px;height:36px;margin-bottom:.5rem">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2">
+                                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                                <line x1="4" y1="22" x2="4" y2="15"/>
+                                            </svg>
+                                        </div>
+                                        <div class="upload-title" style="font-size:.8rem">Click to upload flag</div>
+                                        <div class="upload-sub">PNG, WebP, JPG</div>
+                                    </div>
+                                    <img id="flagPreviewThumb" src="" alt="Flag preview"
+                                        style="display:none;width:60px;height:44px;object-fit:cover;border-radius:6px;border:2px solid var(--pink-border);margin:0 auto;">
                                 </div>
-                                <span class="field-hint">Paste a flag emoji directly</span>
+                                <span class="field-hint">Square or landscape image works best</span>
                             </div>
-                            {{-- <div class="field">
-                                <label class="field-label" for="continent">Continent <span class="req">*</span></label>
-                                <select id="continent" name="continent" required>
-                                    <option value="" disabled {{ old('continent') ? '' : 'selected' }}>Select continent</option>
-                                    @foreach(['Africa','Antarctica','Asia','Europe','North America','Oceania','South America'] as $c)
-                                        <option value="{{ $c }}" {{ old('continent') == $c ? 'selected' : '' }}>{{ $c }}</option>
-                                    @endforeach
-                                </select>
-                            </div> --}}
+                        
                         </div>
 
-                        {{-- <div class="field-row cols-1">
-                            <div class="field">
-                                <label class="field-label" for="aliases">Also Known As / Aliases</label>
-                                <div class="tag-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
-                                    <input type="text" id="tagInput" class="tag-input" placeholder="Type and press Enter...">
-                                    <input type="hidden" name="aliases" id="aliasesHidden" value="{{ old('aliases') }}">
-                                </div>
-                                <span class="field-hint">Alternate names used in search (e.g. Maldive Islands)</span>
-                            </div>
-                        </div> --}}
-
-                        {{-- <div class="field-row cols-1">
-                            <div class="field">
-                                <label class="field-label" for="description">Short Description</label>
-                                <textarea id="description" name="description" rows="3"
-                                    placeholder="Brief description shown on the destination card...">{{ old('description') }}</textarea>
-                            </div>
-                        </div> --}}
+                     
                     </div>
                 </div>
 
@@ -848,15 +816,7 @@
                             </div>
                         </div>
 
-                        {{-- <div class="field-row cols-1">
-                            <div class="field">
-                                <label class="field-label" for="image_alt">Image Alt Text</label>
-                                <input type="text" id="image_alt" name="image_alt"
-                                       placeholder="e.g. Aerial view of Maldives crystal waters"
-                                       value="{{ old('image_alt') }}">
-                                <span class="field-hint">Used for accessibility and SEO</span>
-                            </div>
-                        </div> --}}
+                       
                     </div>
                 </div>
 
@@ -891,12 +851,20 @@
                                             'Visa Required'     => '🔴',
                                         ];
                                     @endphp
-                                    @foreach($statuses as $label => $icon)
-                                        <label class="chip {{ old('visa_status') == $label ? 'selected' : '' }}">
-                                            <input type="radio" name="visa_status" value="{{ $label }}"
-                                                   {{ old('visa_status') == $label ? 'checked' : '' }}
-                                                   onchange="updatePreview(); document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected')); this.closest('.chip').classList.add('selected')">
-                                            {{ $icon }} {{ $label }}
+                                    @foreach($visa_types as $visatype)
+                                        <label class="chip {{ old('visa_type') == $visatype->id ? 'selected' : '' }}">
+                                            
+                                            <input type="radio" 
+                                                name="visa_type" 
+                                                value="{{ $visatype->id }}"
+                                                {{ old('visa_type') == $visatype->id ? 'checked' : '' }}
+                                                onchange="
+                                                    updatePreview(); 
+                                                    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); 
+                                                    this.closest('.chip').classList.add('selected')
+                                                ">
+
+                                            {{ $visatype->icon ?? '' }} {{ $visatype->name }}
                                         </label>
                                     @endforeach
                                 </div>
@@ -905,33 +873,7 @@
 
                         <div class="section-divider"></div>
 
-                        {{-- Visa Types --}}
-                        {{-- <div class="field-row cols-1">
-                            <div class="field">
-                                <label class="field-label">Available Visa Types</label>
-                                <div class="visa-list">
-                                    @foreach($visa_type as $vt)
-                                    <label class="visa-item {{ in_array($vt->id, old('visa_types', [])) ? 'selected' : '' }}"
-                                           onclick="this.classList.toggle('selected'); this.querySelector('input').checked = !this.querySelector('input').checked">
-                                        <input type="checkbox" name="visa_types[]"
-                                               value="{{ $vt->id }}"
-                                               {{ in_array($vt->id, old('visa_types', [])) ? 'checked' : '' }}>
-                                        <span class="visa-item-check">
-                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
-                                                <polyline points="20 6 9 17 4 12"/>
-                                            </svg>
-                                        </span>
-                                        <span>
-                                            <span class="visa-item-label">{{ $vt->name }}</span>
-                                            @if($vt->description ?? null)
-                                            <span class="visa-item-sub">{{ $vt->description }}</span>
-                                            @endif
-                                        </span>
-                                    </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div> --}}
+                     
 
                         <div class="section-divider"></div>
 
@@ -1160,99 +1102,142 @@
     }
 
     function resetPreview() {
-        document.getElementById('previewPlaceholder').style.display = 'flex';
-        document.getElementById('previewBody').style.display = 'none';
-        document.getElementById('previewOverlay').style.display = 'none';
-        document.getElementById('previewImg').style.display = 'none';
-        document.getElementById('imgPreviewWrap').classList.remove('visible');
-        document.getElementById('imgPreviewInner').innerHTML = '';
-        tags = [];
-        renderTags();
+    document.getElementById('previewPlaceholder').style.display = 'flex';
+    document.getElementById('previewBody').style.display = 'none';
+    document.getElementById('previewOverlay').style.display = 'none';
+    document.getElementById('previewImg').style.display = 'none';
+    document.getElementById('imgPreviewWrap').classList.remove('visible');
+    document.getElementById('imgPreviewInner').innerHTML = '';
+    // Reset flag zone
+    document.getElementById('flagPreviewThumb').style.display = 'none';
+    document.getElementById('flagUploadContent').style.display = 'block';
+    document.getElementById('previewFlag').innerHTML = '🏳️';
     }
 
-    /* ── Image Preview ── */
-    function handleImagePreview(input) {
+        /* ── Image Preview ── */
+        function handleImagePreview(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById('previewImg');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                document.getElementById('previewPlaceholder').style.display = 'none';
+                document.getElementById('previewOverlay').style.display = 'block';
+                document.getElementById('previewBody').style.display = 'block';
+
+                // Thumb strip
+                const wrap = document.getElementById('imgPreviewWrap');
+                const inner = document.getElementById('imgPreviewInner');
+                inner.innerHTML = '';
+                const thumb = document.createElement('img');
+                thumb.src = e.target.result;
+                thumb.className = 'img-thumb';
+                inner.appendChild(thumb);
+                wrap.classList.add('visible');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /* ── Drag & Drop ── */
+        const zone = document.getElementById('uploadZone');
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const dt = e.dataTransfer;
+            if (dt.files.length) {
+                document.getElementById('cardImage').files = dt.files;
+                handleImagePreview(document.getElementById('cardImage'));
+            }
+        });
+
+        /* ── Tag / Alias input ── */
+        let tags = [];
+
+        function renderTags() {
+            const wrap = document.getElementById('tagWrap');
+            const input = document.getElementById('tagInput');
+            // Remove all tags (keep the input)
+            wrap.querySelectorAll('.tag').forEach(t => t.remove());
+            tags.forEach((tag, i) => {
+                const el = document.createElement('span');
+                el.className = 'tag';
+                el.innerHTML = `${tag}<span class="tag-remove" onclick="removeTag(${i})">×</span>`;
+                wrap.insertBefore(el, input);
+            });
+            document.getElementById('aliasesHidden').value = tags.join(',');
+        }
+
+        function removeTag(i) { tags.splice(i, 1); renderTags(); }
+
+        document.getElementById('tagInput').addEventListener('keydown', function(e) {
+            if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+                e.preventDefault();
+                tags.push(this.value.trim());
+                this.value = '';
+                renderTags();
+            } else if (e.key === 'Backspace' && !this.value && tags.length) {
+                tags.pop();
+                renderTags();
+            }
+        });
+
+        /* ── Auto-slug from name ── */
+        document.getElementById('country_name').addEventListener('input', function() {
+            const slug = document.getElementById('slug');
+            if (!slug.dataset.manual) {
+                slug.value = this.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            }
+            updatePreview();
+        });
+
+        document.getElementById('slug').addEventListener('input', function() {
+            this.dataset.manual = 'true';
+        });
+
+        function handleFlagPreview(input) {
         if (!input.files || !input.files[0]) return;
-        const file = input.files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
-            const img = document.getElementById('previewImg');
-            img.src = e.target.result;
-            img.style.display = 'block';
-            document.getElementById('previewPlaceholder').style.display = 'none';
-            document.getElementById('previewOverlay').style.display = 'block';
-            document.getElementById('previewBody').style.display = 'block';
-
-            // Thumb strip
-            const wrap = document.getElementById('imgPreviewWrap');
-            const inner = document.getElementById('imgPreviewInner');
-            inner.innerHTML = '';
-            const thumb = document.createElement('img');
+            // Show thumbnail inside upload zone
+            const thumb = document.getElementById('flagPreviewThumb');
             thumb.src = e.target.result;
-            thumb.className = 'img-thumb';
-            inner.appendChild(thumb);
-            wrap.classList.add('visible');
+            thumb.style.display = 'block';
+            document.getElementById('flagUploadContent').style.display = 'none';
+
+            // Update card preview flag image
+            const previewFlag = document.getElementById('previewFlag');
+            previewFlag.innerHTML = '';  // clear any old emoji/text
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.cssText = 'width:32px;height:24px;object-fit:cover;border-radius:3px;display:block;margin:0 auto .4rem;';
+            previewFlag.appendChild(img);
+
+            updatePreview();
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(input.files[0]);
     }
 
-    /* ── Drag & Drop ── */
-    const zone = document.getElementById('uploadZone');
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-        e.preventDefault();
-        zone.classList.remove('drag-over');
-        const dt = e.dataTransfer;
-        if (dt.files.length) {
-            document.getElementById('cardImage').files = dt.files;
-            handleImagePreview(document.getElementById('cardImage'));
-        }
-    });
+    // Fix updatePreview — flag_emoji is now a file input, not text
+    function updatePreview() {
+        const name = document.getElementById('country_name').value.trim();
+        const vEl  = document.querySelector('input[name="visa_type_id"]:checked');
+        const visa = vEl ? vEl.closest('.chip').textContent.trim().toUpperCase() : '';
 
-    /* ── Tag / Alias input ── */
-    let tags = [];
+        // Use flag image if already loaded, otherwise show placeholder
+        const hasFlagImg = document.getElementById('flagPreviewThumb').style.display !== 'none';
+        const hasContent = name || hasFlagImg;
 
-    function renderTags() {
-        const wrap = document.getElementById('tagWrap');
-        const input = document.getElementById('tagInput');
-        // Remove all tags (keep the input)
-        wrap.querySelectorAll('.tag').forEach(t => t.remove());
-        tags.forEach((tag, i) => {
-            const el = document.createElement('span');
-            el.className = 'tag';
-            el.innerHTML = `${tag}<span class="tag-remove" onclick="removeTag(${i})">×</span>`;
-            wrap.insertBefore(el, input);
-        });
-        document.getElementById('aliasesHidden').value = tags.join(',');
+        document.getElementById('previewPlaceholder').style.display = hasContent ? 'none' : 'flex';
+        document.getElementById('previewBody').style.display       = hasContent ? 'block' : 'none';
+        document.getElementById('previewOverlay').style.display    = hasContent ? 'block' : 'none';
+
+        if (name) document.getElementById('previewName').textContent = name.toUpperCase();
+        if (visa) document.getElementById('previewVisa').textContent = visa;
     }
-
-    function removeTag(i) { tags.splice(i, 1); renderTags(); }
-
-    document.getElementById('tagInput').addEventListener('keydown', function(e) {
-        if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
-            e.preventDefault();
-            tags.push(this.value.trim());
-            this.value = '';
-            renderTags();
-        } else if (e.key === 'Backspace' && !this.value && tags.length) {
-            tags.pop();
-            renderTags();
-        }
-    });
-
-    /* ── Auto-slug from name ── */
-    document.getElementById('country_name').addEventListener('input', function() {
-        const slug = document.getElementById('slug');
-        if (!slug.dataset.manual) {
-            slug.value = this.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        }
-        updatePreview();
-    });
-
-    document.getElementById('slug').addEventListener('input', function() {
-        this.dataset.manual = 'true';
-    });
 </script>
 
 @endsection

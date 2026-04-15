@@ -5,7 +5,23 @@ use App\Http\Controllers\HomePageController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\VisaApplyController;
+use Twilio\Rest\Client;
 
+
+Route::get('/test-whatsapp', function () {
+    $client = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
+
+    $client->messages->create(
+        'whatsapp:+917888845434',
+        [
+            'from' => env('TWILIO_WHATSAPP_FROM'),
+            'body' => 'Test message from vsglobaltravels'
+        ]
+    );
+
+    return 'Message Sent';
+});
 
 
 Route::get('/', [HomePageController::class, 'homePage']);
@@ -15,7 +31,13 @@ Route::get('/', [HomePageController::class, 'homePage']);
 Route::post('/booking',                  [BookingController::class, 'bookingStore'])->name('booking.store');
 Route::get('/booking/{booking}/success', [BookingController::class, 'success'])->name('booking.success');
 Route::get('/countries',[CountryController::class,'index'])->name('country-list');
+Route::get('/countries/{country}',[CountryController::class,'countryType'])->name('country-type');
+Route::get('/start-application/{country}',[VisaApplyController::class,'startApplication'])->name('visa.apply');
+Route::post('/scan-passport', [VisaApplyController::class, 'scan']);
+Route::post('/save-passport-data', [VisaApplyController::class, 'savePassport']);
 
+Route::post('/save-travelers', [VisaApplyController::class, 'saveTravelers']);
+Route::get('/payment', [VisaApplyController::class, 'payment']);
 //  admin 
 // Route::get('/admin',[AdminController::class,'showLogin'])->name('admin.login');
 

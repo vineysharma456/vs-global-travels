@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'My App')</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -227,8 +228,8 @@
 
         /* MAIN CONTENT */
         .main-content {
-            margin-left: var(--sidebar-width);
-            margin-top: var(--header-height);
+            /* margin-left: var(--sidebar-width); */
+            /* margin-top: var(--header-height); */
             padding: 24px;
             min-height: calc(100vh - var(--header-height));
             transition: all 0.3s ease;
@@ -244,7 +245,7 @@
         body.sidebar-collapsed .nav-link { justify-content: center; padding: 12px; }
         body.sidebar-collapsed .user-card { justify-content: center; }
         body.sidebar-collapsed .main-header { left: var(--sidebar-collapsed); }
-        body.sidebar-collapsed .main-content { margin-left: var(--sidebar-collapsed); }
+        /* body.sidebar-collapsed .main-content { margin-left: var(--sidebar-collapsed); } */
 
         /* MOBILE */
         @media (max-width: 992px) {
@@ -257,6 +258,7 @@
             .main-content { margin-left: 0; }
         }
     </style>
+     {{-- @stack('scripts') --}}
     @stack('styles')
 </head>
 
