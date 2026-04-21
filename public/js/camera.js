@@ -2,6 +2,9 @@
    camera.js  —  Camera / file-upload / preview / retake
 ───────────────────────────────────────────────────────── */
 
+let currentTab    = 'camera';   // ← ADDED: was missing, caused silent failures
+let currentStream = null;       // ← ADDED: was missing, stopCamera() would throw
+
 /* ─── Tab switch ─── */
 function switchTab(tab) {
     currentTab = tab;
@@ -15,8 +18,9 @@ function switchTab(tab) {
         document.getElementById('btn-capture').textContent     = 'Choose File';
         document.getElementById('btn-capture').style.display   = 'block';
         document.getElementById('btn-capture').onclick         = () => {
-            document.getElementById('file-input').value = '';
-            document.getElementById('file-input').click();
+            const fi = document.getElementById('file-input');
+            fi.value = '';   // ← reset so same file can be re-selected
+            fi.click();
         };
     } else {
         document.getElementById('live-video').style.display    = 'block';
@@ -131,8 +135,9 @@ function retakePhoto() {
         document.getElementById('btn-capture').style.display = 'block';
         document.getElementById('btn-capture').textContent   = 'Choose File';
         document.getElementById('btn-capture').onclick       = () => {
-            document.getElementById('file-input').value = '';
-            document.getElementById('file-input').click();
+            const fi = document.getElementById('file-input');
+            fi.value = '';   // ← reset so same file can be re-selected
+            fi.click();
         };
     }
 }

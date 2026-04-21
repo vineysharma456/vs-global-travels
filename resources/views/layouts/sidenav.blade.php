@@ -436,7 +436,7 @@
             <div class="nav-section">
                 <div class="nav-section-label">Manage</div>
 
-                <a href="#" data-tip="Orders"
+                <a href="{{ route('admin.country-list')}}" data-tip="Orders"
                    class="nav-item {{ request()->is('admin/orders*') ? 'active' : '' }}">
                     <span class="nav-icon">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -445,8 +445,8 @@
                             <path d="M16 10a4 4 0 0 1-8 0"/>
                         </svg>
                     </span>
-                    <span class="nav-label">Orders</span>
-                    <span class="nav-badge">5</span>
+                    <span class="nav-label">Country Images</span>
+                    {{-- <span class="nav-badge">5</span> --}}
                 </a>
 
                 <a href="#" data-tip="Users"

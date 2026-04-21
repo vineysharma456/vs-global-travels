@@ -576,13 +576,13 @@
                         <span class="meta-key">Type</span>
                         <span class="meta-val">{{ $country->visa_type_name }}</span>
                     </div>
-                    @if($country->validity_days)
+                    @if($country->validity_days && !in_array($country->visa_type_name,['Visa Free','Visa on Arrival']))
                     <div class="meta-item">
                         <span class="meta-key">Valid</span>
                         <span class="meta-val">{{ $country->validity_days }} Days</span>
                     </div>
                     @endif
-                    @if($country->visa_fee !== null)
+                    @if($country->visa_fee !== null && !in_array($country->visa_type_name, ['Visa Free', 'Visa on Arrival']))
                     <div class="meta-item">
                         <span class="meta-key">Fees</span>
                         <span class="meta-val">

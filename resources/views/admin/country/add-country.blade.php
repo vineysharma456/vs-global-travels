@@ -882,14 +882,14 @@
                             <div class="field">
                                 <label class="field-label">Required Documents</label>
                                 <div class="chip-group">
-                                    @foreach($visa_type_document as $doc)
-                                    <label class="chip {{ in_array($doc->id, old('documents', [])) ? 'selected' : '' }}"
-                                           onclick="this.classList.toggle('selected'); this.querySelector('input').checked = !this.querySelector('input').checked">
-                                        <input type="checkbox" name="documents[]"
-                                               value="{{ $doc->id }}"
-                                               {{ in_array($doc->id, old('documents', [])) ? 'checked' : '' }}>
-                                        📄 {{ $doc->name }}
-                                    </label>
+                                   @foreach($visa_type_document as $doc)
+                                        <label class="chip {{ in_array($doc->id, old('documents', [])) ? 'selected' : '' }}"
+                                            onclick="toggleDocChip(this)">
+                                            <input type="checkbox" name="documents[]"
+                                                value="{{ $doc->id }}"
+                                                {{ in_array($doc->id, old('documents', [])) ? 'checked' : '' }}>
+                                            📄 {{ $doc->name }}
+                                        </label>
                                     @endforeach
                                 </div>
                             </div>
@@ -897,7 +897,7 @@
 
                         <div class="section-divider"></div>
 
-                        <div class="field-row cols-2">
+                        <div class="field-row cols-3">
                             <div class="field">
                                 <label class="field-label" for="visa_fee">Visa Fee (USD)</label>
                                 <div class="input-wrap">
@@ -910,6 +910,19 @@
                                            value="{{ old('visa_fee') }}">
                                 </div>
                                 <span class="field-hint">Enter 0 for free / no visa</span>
+                            </div>
+                            <div class="field">
+                                <label class="field-label" for="service_fee">Service Fee (USD)</label>
+                                <div class="input-wrap">
+                                    <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <line x1="12" y1="1" x2="12" y2="23"/>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                    </svg>
+                                    <input type="number" id="service_fee" name="service_fee"
+                                        placeholder="0.00" min="0" step="0.01"
+                                        value="{{ old('service_fee') }}">
+                                </div>
+                                <span class="field-hint">Extra service charge</span>
                             </div>
                             <div class="field">
                                 <label class="field-label" for="processing_days">Processing Time (days)</label>
@@ -1238,6 +1251,12 @@
         if (name) document.getElementById('previewName').textContent = name.toUpperCase();
         if (visa) document.getElementById('previewVisa').textContent = visa;
     }
+
+    function toggleDocChip(label) {
+            const cb = label.querySelector('input[type="checkbox"]');
+            cb.checked = !cb.checked;
+            label.classList.toggle('selected', cb.checked);
+        }
 </script>
 
 @endsection

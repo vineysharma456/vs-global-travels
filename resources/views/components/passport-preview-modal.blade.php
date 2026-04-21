@@ -155,7 +155,6 @@ document.getElementById('passport-form').addEventListener('submit', function(e) 
     const mobile = document.getElementById('mobile').value.trim();
     const email  = document.getElementById('email').value.trim();
 
-    // ✅ REQUIRED VALIDATION
     if (!mobile || !email) {
         alert("Mobile and Email are required!");
         return;
@@ -174,25 +173,21 @@ document.getElementById('passport-form').addEventListener('submit', function(e) 
         return;
     }
 
-    const formData = new FormData(this);
+    // ✅ UPDATE GLOBAL TRAVELER OBJECT
+    const traveler = travelers[currentTraveler];
 
-    fetch('/save-passport-data', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-        },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert("Saved successfully!");
+    if (!traveler.passport) {
+        traveler.passport = {};
+    }
 
-        closePreview(); // ✅ ONLY EXIT
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Error saving data");
-    });
+    traveler.passport.mobile = mobile;
+    traveler.passport.email  = email;
+
+    console.log("Updated traveler:", traveler); // DEBUG
+
+    alert("Saved successfully!");
+
+    closePreview();
 });
 
 

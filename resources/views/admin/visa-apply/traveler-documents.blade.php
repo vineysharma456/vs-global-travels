@@ -60,22 +60,33 @@ window.VD = {
     saveTravelersUrl:"{{ route('visa.save-travelers') }}",
     csrfToken:       "{{ csrf_token() }}",
     countryId:       {{ $country->id }},
-    {{-- Seed traveler state so JS knows what's already uploaded --}}
-    travelers: @json(
-        collect($travelers)->map(fn($t) => [
-            'name'     => $t['name'] ?? '',
-            'uploads'  => $t['uploads'] ?? ['photo'=>null,'front'=>null,'back'=>null],
-            'passport' => $t['passport'] ?? null,
-        ])
-    ),
+
+    travelers: {!! json_encode(
+        collect($travelers)->map(function($t) {
+            return [
+                'name'     => $t['name'] ?? '',
+                'uploads'  => $t['uploads'] ?? ['photo'=>null,'front'=>null,'back'=>null],
+                'passport' => $t['passport'] ?? null,
+            ];
+        })->values()
+    ) !!},
 };
 </script>
 
 @endsection
 
 @push('scripts')
+{{-- ─────────────────────────────────────────────────────────
+     CRITICAL: Load order matters.
+       1. face-api      — loaded first so faceapi global exists when ocr.js runs
+       2. traveler.js   — declares `travelers`, `currentTraveler`, `currentType`,
+                          `capturedData`, and all shared helpers (setCheck etc.)
+                          MUST be before camera.js and ocr.js
+       3. camera.js     — reads `currentType`, `capturedData` from traveler.js
+       4. ocr.js        — reads `travelers`, `currentTraveler` from traveler.js
+─────────────────────────────────────────────────────────── --}}
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="{{ asset('js/traveler.js') }}"></script>
 <script src="{{ asset('js/camera.js') }}"></script>
 <script src="{{ asset('js/ocr.js') }}"></script>
-<script src="{{ asset('js/traveler.js') }}"></script>
 @endpush

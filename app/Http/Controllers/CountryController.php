@@ -8,13 +8,32 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Country;
 use App\Models\VisaType;
 use App\Models\VisaTypeDocument;
-
+use App\Models\CountryImage;
 class CountryController extends Controller
 {
     public function addCountries()
     {
         $visa_type_document = VisaTypeDocument::get();
         $visa_types          = VisaType::get();
+
+        // $documents=DB::table('country_document as cd')
+        //           ->where('cd.country_id',$country->id)
+        //           ->leftJoin('visa_type_documents as vtd','cd.visa_type_document_id','=','vtd.id')
+        //           ->select('cd.*','vtd.name as document')
+        //           ->get();
+                  
+        //  $photoDoc = $documents->firstWhere('document', 'Photo');
+
+        // $passportDocs = $documents->filter(function ($doc) {
+        //     return str_contains(strtolower($doc->document), 'passport');
+        // });
+
+        // $otherDocs = $documents->reject(function ($doc) {
+        //     return str_contains(strtolower($doc->document), 'passport')
+        //         || strtolower($doc->document) === 'photo';
+        // });
+
+
 
         return view('admin.country.add-country', compact('visa_types', 'visa_type_document'));
     }
@@ -109,7 +128,7 @@ class CountryController extends Controller
         'processing_days' => 'nullable|integer|min:0',
         'stay_duration'   => 'nullable|integer|min:1',
         'validity_days'   => 'nullable|integer|min:1',
-
+         'service_fee' => 'nullable|numeric|min:0', 
         'documents'       => 'nullable|array',
         'documents.*'     => 'exists:visa_type_documents,id',
 
@@ -137,7 +156,7 @@ class CountryController extends Controller
             'processing_days' => $validated['processing_days'] ?? null,
             'stay_duration'   => $validated['stay_duration'] ?? null,
             'validity_days'   => $validated['validity_days'] ?? null,
-
+            'service_fee' => $validated['service_fee'] ?? 0,
             'is_published'    => $request->boolean('is_published'),
             'is_featured'     => $request->boolean('is_featured'),
             'is_visa_free'    => $request->boolean('is_visa_free'),
@@ -210,6 +229,7 @@ class CountryController extends Controller
     }
 
     public function countryType(Country $country){
+        $country->load('images');
         $type = $country->visa_type;
         
      
@@ -218,11 +238,80 @@ class CountryController extends Controller
      return match($type){
         1=>view('country-types.e-visa',compact('country')),
         2=>view('country-types.sticker-visa'),
-        3=>view('country-types.visa-free'),
-        4=>view('country-types.e-visa'),
+        3=>view('country-types.visa-free',['country' => $country->load('images')]),
+        4=>view('country-types.visa-on-arrival',['country' => $country->load('images')]),
 
      };
       
+
+    
        
+    }
+
+    public function countryList(){
+        $countries = Country::get();
+        // dd($countries->country_name);
+
+        return view('admin.country.countries-list',compact('countries'));
+
+     }
+
+     public function countryImages($id)
+    {
+        $country = Country::with('images')->findOrFail($id);
+
+        return view('admin.country.country-images', compact('country'));
+    }
+
+    public function storeCountryImages(Request $request)
+    {
+        $request->validate([
+            'country_id' => 'required|exists:countries,id',
+            'images.*' => 'required|image',
+            'sequence.*' => 'required|integer'
+        ]);
+
+        foreach ($request->images as $key => $image) {
+            $path = $image->store('countries', 'public');
+
+            CountryImage::create([
+                'country_id' => $request->country_id,
+                'image' => $path,
+                'sequence' => $request->sequence[$key]
+            ]);
+        }
+
+        return back()->with('success', 'Images uploaded successfully');
+    }
+
+    public function reorder(Request $request)
+   {
+        foreach ($request->order as $index => $id) {
+            CountryImage::where('id', $id)->update(['sequence' => $index + 1]);
+        }
+        return back()->with('success', 'Image order saved.');
+    }
+
+   public function destroy($id)
+    {
+        $image = CountryImage::findOrFail($id);
+
+        $countryId = $image->country_id;
+        $deletedSequence = $image->sequence;
+
+        // 1. Delete image file from storage
+        if ($image->image && Storage::disk('public')->exists($image->image)) {
+            Storage::disk('public')->delete($image->image);
+        }
+
+        // 2. Delete record
+        $image->delete();
+
+        // 3. Update sequence of remaining images
+        CountryImage::where('country_id', $countryId)
+            ->where('sequence', '>', $deletedSequence)
+            ->decrement('sequence');
+
+        return back()->with('success', 'Image deleted and sequence updated');
     }
 }

@@ -56,7 +56,7 @@
         </div>
 
         <!-- CTA Button -->
-        <a href="{{ route('visa.apply',[$country->id]) }}"
+        <a href="{{ route('traveler-documents',[$country->id]) }}"
            style="display:inline-block;background:white;color:#0f2a4a;border-radius:999px;padding:14px 48px;font-size:1rem;font-weight:500;text-decoration:none;letter-spacing:0.3px;">
             Start Application
         </a>

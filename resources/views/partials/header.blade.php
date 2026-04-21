@@ -42,7 +42,7 @@
           <a class="nav-link" href="#">FAQs</a>
         </li>
         <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-          <a href="#" class="btn btn-book">Book Now</a>
+          <a href="{{ route('home-page')}}" class="nav-link">Book Now</a>
         </li>
       </ul>
     </div>

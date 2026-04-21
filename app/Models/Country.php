@@ -22,6 +22,7 @@ class Country extends Model
         'is_published',
         'is_featured',
         'is_visa_free',
+        'service_fee'
     ];
 
     protected $casts = [
@@ -39,5 +40,9 @@ class Country extends Model
             'country_id',
             'visa_type_document_id'
         );
+    }
+
+    public function images(){
+        return $this->hasMany(CountryImage::class)->orderBy('sequence');
     }
 }

@@ -3,6 +3,8 @@
    HTML markup lives in components/js-templates.blade.php
 ───────────────────────────────────────────────────────── */
 
+let modelsReady = false;   // ← ADDED: was missing, analyzeImage() would throw ReferenceError
+
 /* ─── Load face-api models once ─── */
 (async () => {
     try {
@@ -196,7 +198,17 @@ function showPassportData(data) {
     const fullName = [data.first_name, data.last_name].filter(Boolean).join(' ').trim();
     if (fullName) traveler.name = fullName;
 
-    renderTravelers();
+    // Update name input + avatar in DOM
+    const nameInput = document.querySelector(`[data-name-input="${currentTraveler}"]`);
+    if (nameInput && fullName) {
+        nameInput.value = fullName;
+        const initials = fullName.trim().split(/\s+/).map(w => w[0].toUpperCase()).join('').slice(0, 2);
+        const av = document.getElementById(`avatar-${currentTraveler}`);
+        const nm = document.getElementById(`tcname-${currentTraveler}`);
+        if (av) av.textContent = initials;
+        if (nm) nm.textContent = fullName;
+    }
+
     openPreviewModal(traveler.passport);
 }
 
