@@ -70,7 +70,7 @@ Route::get('/login', function () {
 Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     Route::get('/dashboard', [AdminController::class, 'adminDashboard'])->name('admin.dashboard');
-
+    Route::get('/applcations', [AdminController::class, 'visaApplications'])->name('visa.applications');
     Route::get('/add-countries',[CountryController::class,'addCountries'])->name('admin.add-country');
     Route::post('/admin/countries', [CountryController::class, 'store'])->name('admin.countries.store');
     Route::get('/country-list',[CountryController::class,'countryList'])->name('admin.country-list');
@@ -81,7 +81,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         ->name('admin.country.images.reorder');
     Route::delete('admin/country/images/{image}', [CountryController::class, 'destroy'])
      ->name('admin.country.images.destroy');
+    Route::get('/visa-file/{path}', function ($path) {
+                $fullPath = storage_path('app/private/' . $path);
 
+                if (!file_exists($fullPath)) {
+                    abort(404);
+                }
+
+                return response()->file($fullPath);
+            })->where('path', '.*');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
 });
